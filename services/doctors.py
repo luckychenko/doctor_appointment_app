@@ -1,6 +1,6 @@
 
 from fastapi import HTTPException
-from schemas.doctors import Doctors, DoctorsCreateEdit, doctors
+from schemas.doctors import Doctor, DoctorCreateEdit, doctors
 
 
 class DoctorsServer:
@@ -21,17 +21,17 @@ class DoctorsServer:
 
 
     @staticmethod
-    def create_doctor(payload: DoctorsCreateEdit):
+    def create_doctor(payload: DoctorCreateEdit):
         # create a new doctor resource using the DoctorsCreateEdit Model with payload data
         # since the Doctors Model autogenerate id for each instance
 
-        new_doctor = Doctors(**payload.model_dump())
+        new_doctor = Doctor(**payload.model_dump())
         doctors[new_doctor.id] = new_doctor
         return new_doctor
     
 
     @staticmethod
-    def edit_doctor(doctor_id: int, payload: DoctorsCreateEdit):
+    def edit_doctor(doctor_id: int, payload: DoctorCreateEdit):
         #find the doctor from the DB
         doc_found = doctors.get(doctor_id)
         # if found update the info else raise exception
@@ -45,6 +45,13 @@ class DoctorsServer:
         
         return doc_found
         
+    def set_availability(doctor_id: int, is_available: bool):
+        doctor = next((doctor for doctor in doctors if doctor.id == doctor_id), None)
+        if not doctor:
+            raise HTTPException(status_code=404, detail="doctor not found")
+        
+        doctor.is_available = is_available
+        return is_available
 
     @staticmethod
     def delete_doctor(doctor_id: int):

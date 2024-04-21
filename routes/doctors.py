@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from schemas.doctors import DoctorsCreateEdit, doctors
+from schemas.doctors import DoctorCreateEdit, doctors
 from services.doctors import doctor_services
 
 
@@ -18,14 +18,19 @@ def get_doctor(doctor_id: int):
     return {'message':'successful', 'data': data}
 
 @doctors_router.post('/', status_code=201)
-def create_doctor(payload: DoctorsCreateEdit):
+def create_doctor(payload: DoctorCreateEdit):
     data = doctor_services.create_doctor(payload)
     return {'message':'created', 'data': data}
 
 @doctors_router.put('/{doctor_id}', status_code=200)
-def edit_doctor(doctor_id: int, payload: DoctorsCreateEdit):
+def edit_doctor(doctor_id: int, payload: DoctorCreateEdit):
     data = doctor_services.edit_doctor(doctor_id, payload)
     return {'message': 'doctor edited successfully', 'data': data}
+
+@doctors_router.patch("/{doctor_id}/availability/")
+def set_doctor_availability(doctor_id: int, is_available: bool):
+    doctor_services.set_availability(doctor_id, is_available)
+    return {"message": f"doctor availability set to {is_available}"}
 
 @doctors_router.delete('/{doctor_id}', status_code=204)
 def delete_doctor(doctor_id: int):
