@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from schemas.appointments import Appointment, AppointmentPayload, appointments
 from schemas.patients import Patient, patients, PatientCreateEdit
 from schemas.doctors import doctors
+from services.appointments import AppointmentsServer
 
 
 class PatientsServer:
@@ -82,7 +83,10 @@ class PatientsServer:
         # Set doctor as unavailable
         available_doctors[0].is_available = False
         
-        return appointment
+        data: list = []
+        data.append(appointments[appointment.id])
+        return AppointmentsServer.parser(data)
+        
     
 
 
