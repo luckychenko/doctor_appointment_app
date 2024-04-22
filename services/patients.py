@@ -1,14 +1,16 @@
 
 from fastapi import HTTPException
+from schemas.appointments import Appointment, AppointmentPayload, appointments
 from schemas.patients import Patient, patients, PatientCreateEdit
+from schemas.doctors import doctors
 
 
 class PatientsServer:
 
     @staticmethod
-    def parse_patients(patients_dict):
+    def parse_patients():
         data: list = []
-        for doc in patients_dict:
+        for doc in patients:
             data.append(patients[doc])
         return data
     
@@ -60,6 +62,28 @@ class PatientsServer:
 
 
 
+    @staticmethod
+    def create_appoint(patient_id: int, payload: AppointmentPayload):
+        available_doctors = [doctor for doctor in doctors.values() if doctor.is_available]
+        if not available_doctors:
+            raise HTTPException(status_code=404, detail="No available doctors")
+        
+        
+        #find the patient from the DB
+        pat_found = patients.get(patient_id)
+        # if found update the info else raise exception
+        if not pat_found:
+            raise HTTPException(status_code=404, detail="patient not found")
+        
+        doc_id = available_doctors[0].id 
+        appointment = Appointment(patient=patient_id, doctor=doc_id, **payload.model_dump())        
+        appointments[appointment.id] = appointment
+
+        # Set doctor as unavailable
+        available_doctors[0].is_available = False
+        
+        return appointment
+    
 
 
 patient_services = PatientsServer()

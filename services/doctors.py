@@ -1,14 +1,14 @@
 
 from fastapi import HTTPException
-from schemas.doctors import Doctor, DoctorCreateEdit, doctors
+from schemas.doctors import Doctor, DoctorAvailable, DoctorCreateEdit, doctors
 
 
 class DoctorsServer:
 
     @staticmethod
-    def parse_doctors(doctors_dict):
+    def parse_doctors():
         data: list = []
-        for doc in doctors_dict:
+        for doc in doctors:
             data.append(doctors[doc])
         return data
     
@@ -44,14 +44,16 @@ class DoctorsServer:
             doc_found.is_available = payload.is_available
         
         return doc_found
-        
-    def set_availability(doctor_id: int, is_available: bool):
-        doctor = next((doctor for doctor in doctors if doctor.id == doctor_id), None)
+
+    @staticmethod 
+    def set_availability(doctor_id: int, available: DoctorAvailable):
+        doctor = next((doctor for doctor in doctors.values() if doctor.id == doctor_id), None)
         if not doctor:
             raise HTTPException(status_code=404, detail="doctor not found")
         
-        doctor.is_available = is_available
-        return is_available
+        doctor.is_available = available
+        return available.is_available
+    
 
     @staticmethod
     def delete_doctor(doctor_id: int):

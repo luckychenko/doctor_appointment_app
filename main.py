@@ -9,8 +9,8 @@ app = FastAPI()
 
 app.include_router(router=doctors_router, prefix='/doctors', tags=['Doctors'])
 app.include_router(router=patients_router, prefix='/patients', tags=['Patients'])
-# app.include_router(router=appointments_router, prefix='/appointments', tags=['Appointments'])
+app.include_router(router=appointments_router, prefix='/appointments', tags=['Appointments'])
 
 @app.get('/')
 def home():
-    return "Welcome"
+    return "This is an API for a medical appointment application"
